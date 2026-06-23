@@ -1,0 +1,20 @@
+services:
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    environment:
+      LDAP_ORGANISATION: "IFTS18"
+      LDAP_DOMAIN: "ifts18.local"
+      LDAP_ADMIN_PASSWORD: "admin123"
+    ports:
+      - "389:389"
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: phpldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+    ports:
+      - "8090:80"
+    depends_on:
+      - openldap

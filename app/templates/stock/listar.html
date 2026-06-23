@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3><i class="bi bi-boxes"></i> Productos</h3>
+    {% if current_user.rol == 'admin' %}
+    <a href="{{ url_for('stock.nuevo') }}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Nuevo Producto
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Precio</th>
+                    {% if current_user.rol == 'admin' %}
+                    <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in productos %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td>{{ p.nombre }}</td>
+                    <td>{{ p.categoria }}</td>
+                    <td>
+                        {% if p.stock <= 5 %}
+                            <span class="badge bg-danger">{{ p.stock }}</span>
+                        {% elif p.stock <= 20 %}
+                            <span class="badge bg-warning text-dark">{{ p.stock }}</span>
+                        {% else %}
+                            <span class="badge bg-success">{{ p.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td>${{ "%.2f"|format(p.precio) }}</td>
+                    {% if current_user.rol == 'admin' %}
+                    <td>
+                        <a href="{{ url_for('stock.editar', id=p.id) }}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{{ url_for('stock.eliminar', id=p.id) }}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Eliminar este producto?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No hay productos cargados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
