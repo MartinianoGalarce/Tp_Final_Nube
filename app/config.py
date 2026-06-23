@@ -16,4 +16,4 @@ class Config:
 
     # Restricción horaria
     HORA_INICIO = 8
-    HORA_FIN = 21
+    HORA_FIN = 23
