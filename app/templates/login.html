@@ -31,14 +31,26 @@
                         <label class="form-label" for="password">
                             <i class="bi bi-lock me-1"></i>Contraseña
                         </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control"
-                            placeholder="••••••••"
-                            required
-                        >
+                        <div class="input-group">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="••••••••"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                id="togglePassword"
+                                tabindex="-1"
+                                title="Mostrar / ocultar contraseña"
+                                style="border:1.5px solid #d1d5db; border-left:none;"
+                            >
+                                <i class="bi bi-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-login">
@@ -58,4 +70,17 @@
         </div>
     </div>
 </div>
+<script>
+document.getElementById('togglePassword').addEventListener('click', function () {
+    var input = document.getElementById('password');
+    var icon  = document.getElementById('toggleIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+});
+</script>
 {% endblock %}
