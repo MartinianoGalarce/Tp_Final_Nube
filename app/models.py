@@ -12,7 +12,7 @@ class Producto(db.Model):
     precio = db.Column(db.Float, default=0.0)
     categoria = db.Column(db.String(50))
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
-    movimientos = db.relationship('Movimiento', backref='producto', lazy=True)
+    movimientos = db.relationship('Movimiento', backref='producto', lazy=True, cascade='all, delete-orphan')
 
 class Movimiento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
