@@ -1,65 +1,112 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3><i class="bi bi-boxes"></i> Productos</h3>
+<div class="page-header">
+    <h2 class="page-title">
+        <i class="bi bi-boxes"></i> Productos
+    </h2>
     {% if current_user.rol == 'admin' %}
     <a href="{{ url_for('stock.nuevo') }}" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> Nuevo Producto
+        <i class="bi bi-plus-circle me-1"></i> Nuevo producto
     </a>
     {% endif %}
 </div>
 
-<div class="card shadow">
+<div class="card">
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
-            <thead class="table-dark">
+            <thead>
                 <tr>
-                    <th>#</th>
+                    <th style="width:50px">#</th>
                     <th>Nombre</th>
+                    <th>Descripción</th>
                     <th>Categoría</th>
-                    <th>Stock</th>
-                    <th>Precio</th>
+                    <th style="width:130px">Stock</th>
+                    <th style="width:110px">Precio</th>
                     {% if current_user.rol == 'admin' %}
-                    <th>Acciones</th>
+                    <th style="width:110px">Acciones</th>
                     {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for p in productos %}
                 <tr>
-                    <td>{{ p.id }}</td>
-                    <td>{{ p.nombre }}</td>
-                    <td>{{ p.categoria }}</td>
+                    <td class="text-muted">{{ p.id }}</td>
+                    <td><strong>{{ p.nombre }}</strong></td>
+                    <td class="text-muted">{{ p.descripcion or '—' }}</td>
+                    <td>
+                        {% if p.categoria %}
+                        <span class="badge" style="background:#e2e8f0;color:#475569;font-weight:600;font-size:.75rem;">
+                            {{ p.categoria }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
                     <td>
                         {% if p.stock <= 5 %}
-                            <span class="badge bg-danger">{{ p.stock }}</span>
+                            <span class="stock-badge stock-critico">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                {{ p.stock }} — Crítico
+                            </span>
                         {% elif p.stock <= 20 %}
-                            <span class="badge bg-warning text-dark">{{ p.stock }}</span>
+                            <span class="stock-badge stock-bajo">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                                {{ p.stock }} — Bajo
+                            </span>
                         {% else %}
-                            <span class="badge bg-success">{{ p.stock }}</span>
+                            <span class="stock-badge stock-ok">
+                                <i class="bi bi-check-circle-fill"></i>
+                                {{ p.stock }}
+                            </span>
                         {% endif %}
                     </td>
-                    <td>${{ "%.2f"|format(p.precio) }}</td>
+                    <td><strong>${{ "%.2f"|format(p.precio) }}</strong></td>
                     {% if current_user.rol == 'admin' %}
                     <td>
-                        <a href="{{ url_for('stock.editar', id=p.id) }}" class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <a href="{{ url_for('stock.eliminar', id=p.id) }}" class="btn btn-sm btn-danger"
-                           onclick="return confirm('¿Eliminar este producto?')">
-                            <i class="bi bi-trash"></i>
-                        </a>
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('stock.editar', id=p.id) }}"
+                               class="btn btn-sm btn-warning"
+                               title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ url_for('stock.eliminar', id=p.id) }}"
+                               class="btn btn-sm btn-danger"
+                               title="Eliminar"
+                               onclick="return confirm('¿Eliminar el producto «{{ p.nombre }}»? Esta acción no se puede deshacer.')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
                     </td>
                     {% endif %}
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted">No hay productos cargados.</td>
+                    <td colspan="{{ 7 if current_user.rol == 'admin' else 6 }}">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            No hay productos cargados.
+                            {% if current_user.rol == 'admin' %}
+                            <br><a href="{{ url_for('stock.nuevo') }}" class="text-decoration-none mt-2 d-inline-block">
+                                <i class="bi bi-plus-circle me-1"></i>Agregar el primero
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+{% if productos %}
+<p class="text-muted mt-2" style="font-size:.8rem;">
+    <i class="bi bi-info-circle me-1"></i>
+    <span class="stock-badge stock-critico" style="font-size:.72rem;padding:.15rem .5rem;">
+        <i class="bi bi-exclamation-triangle-fill"></i> ≤ 5
+    </span> Crítico &nbsp;
+    <span class="stock-badge stock-bajo" style="font-size:.72rem;padding:.15rem .5rem;">
+        <i class="bi bi-exclamation-circle-fill"></i> ≤ 20
+    </span> Stock bajo
+</p>
+{% endif %}
 {% endblock %}

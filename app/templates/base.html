@@ -6,24 +6,450 @@
     <title>Stock IFTS18</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --navy:        #1a2e4a;
+            --navy-dark:   #0f1e31;
+            --navy-light:  #243d62;
+            --accent:      #f59e0b;
+            --bg:          #f0f4f8;
+            --card-bg:     #ffffff;
+            --border:      #e2e8f0;
+            --text:        #1e293b;
+            --text-muted:  #64748b;
+            --success:     #15803d;
+            --success-bg:  #f0fdf4;
+            --success-brd: #86efac;
+            --danger:      #b91c1c;
+            --danger-bg:   #fef2f2;
+            --danger-brd:  #fca5a5;
+            --warning:     #b45309;
+            --warning-bg:  #fffbeb;
+            --warning-brd: #fcd34d;
+            --info:        #1d4ed8;
+            --info-bg:     #eff6ff;
+            --info-brd:    #93c5fd;
+            --shadow:      0 4px 16px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06);
+            --radius:      10px;
+            --radius-sm:   6px;
+        }
+
+        /* ===== BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: .94rem;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,.35);
+            padding: .6rem 0;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: .3px;
+            color: #fff !important;
+        }
+        .navbar-brand .bi {
+            color: var(--accent);
+            margin-right: .25rem;
+        }
+        .navbar-toggler {
+            border-color: rgba(255,255,255,.3);
+        }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        .nav-link {
+            color: rgba(255,255,255,.82) !important;
+            font-size: .88rem;
+            padding: .38rem .7rem !important;
+            border-radius: var(--radius-sm);
+            transition: background .15s, color .15s;
+        }
+        .nav-link:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,.12);
+        }
+        .nav-link.nav-logout {
+            color: #fca5a5 !important;
+        }
+        .nav-link.nav-logout:hover {
+            color: #fff !important;
+            background: rgba(185,28,28,.45);
+        }
+
+        /* Bloque de usuario en navbar */
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .3rem .75rem;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,.1);
+            color: rgba(255,255,255,.9);
+            font-size: .84rem;
+            font-weight: 500;
+            margin-right: .25rem;
+            white-space: nowrap;
+        }
+        .nav-user .bi { font-size: 1rem; }
+
+        /* Pill de rol */
+        .role-pill {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .role-admin    { background: #dc2626; color: #fff; }
+        .role-operador { background: #2563eb; color: #fff; }
+        .role-consulta { background: #6b7280; color: #fff; }
+
+        /* ===== FLASH MESSAGES ===== */
+        .alert {
+            border-radius: var(--radius-sm);
+            border: 1px solid;
+            border-left: 4px solid;
+            padding: .72rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-size: .9rem;
+        }
+        .alert .alert-icon { font-size: 1.05rem; flex-shrink: 0; }
+        .alert .alert-text { flex: 1; }
+        .alert .btn-close   { margin-left: auto; flex-shrink: 0; }
+
+        .alert-success {
+            background: var(--success-bg);
+            border-color: var(--success-brd);
+            border-left-color: var(--success);
+            color: #14532d;
+        }
+        .alert-danger {
+            background: var(--danger-bg);
+            border-color: var(--danger-brd);
+            border-left-color: var(--danger);
+            color: #7f1d1d;
+        }
+        .alert-warning {
+            background: var(--warning-bg);
+            border-color: var(--warning-brd);
+            border-left-color: var(--warning);
+            color: #78350f;
+        }
+        .alert-info {
+            background: var(--info-bg);
+            border-color: var(--info-brd);
+            border-left-color: var(--info);
+            color: #1e3a5f;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: var(--card-bg);
+        }
+        /* Override bg-dark en card-header */
+        .card-header,
+        .card-header.bg-dark {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%) !important;
+            color: #fff !important;
+            border-radius: var(--radius) var(--radius) 0 0 !important;
+            border-bottom: none;
+            padding: .9rem 1.4rem;
+        }
+        .card-header h4,
+        .card-header h5 { margin: 0; font-weight: 600; }
+        .card-header small { color: rgba(255,255,255,.7); }
+        .card-footer {
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            border-radius: 0 0 var(--radius) var(--radius) !important;
+            padding: .7rem 1.4rem;
+        }
+        .card-body { padding: 1.4rem; }
+        .card-body.p-0 { padding: 0 !important; }
+
+        /* ===== TABLES ===== */
+        .table { margin-bottom: 0; }
+        .table thead th {
+            background: var(--navy) !important;
+            color: rgba(255,255,255,.88);
+            font-size: .77rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .55px;
+            padding: .82rem 1rem;
+            border: none;
+            white-space: nowrap;
+        }
+        .table tbody td {
+            padding: .7rem 1rem;
+            vertical-align: middle;
+            border-color: var(--border);
+        }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table-hover tbody tr:hover > td { background: #f5f8fc; }
+
+        /* ===== STOCK BADGES ===== */
+        .stock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            padding: .25rem .6rem;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 600;
+            border: 1px solid;
+        }
+        .stock-critico { background: var(--danger-bg);  color: var(--danger);  border-color: var(--danger-brd);  }
+        .stock-bajo    { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-brd); }
+        .stock-ok      { background: var(--success-bg); color: var(--success); border-color: var(--success-brd); }
+
+        /* ===== TIPO MOVIMIENTO BADGES ===== */
+        .tipo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            padding: .25rem .6rem;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 600;
+            border: 1px solid;
+        }
+        .tipo-entrada { background: var(--success-bg); color: var(--success); border-color: var(--success-brd); }
+        .tipo-salida  { background: var(--danger-bg);  color: var(--danger);  border-color: var(--danger-brd);  }
+
+        /* Tinte de filas de movimientos */
+        .row-entrada td { background-color: #fafffe !important; }
+        .row-salida  td { background-color: #fffafa !important; }
+        .table-hover tbody .row-entrada:hover td { background-color: #edfdf8 !important; }
+        .table-hover tbody .row-salida:hover  td { background-color: #fff0f0 !important; }
+
+        /* ===== BOTONES ===== */
+        .btn {
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: .88rem;
+            transition: all .18s;
+        }
+        .btn-sm { font-size: .79rem; padding: .28rem .65rem; }
+        .btn i  { font-size: .88rem; }
+
+        .btn-primary {
+            background: var(--navy);
+            border-color: var(--navy);
+        }
+        .btn-primary:hover {
+            background: var(--navy-light);
+            border-color: var(--navy-light);
+        }
+
+        /* ===== FORMULARIOS ===== */
+        .form-label {
+            font-weight: 600;
+            font-size: .86rem;
+            color: #374151;
+            margin-bottom: .28rem;
+        }
+        .form-control,
+        .form-select {
+            border: 1.5px solid #d1d5db;
+            border-radius: var(--radius-sm);
+            padding: .55rem .85rem;
+            font-size: .92rem;
+            color: var(--text);
+            transition: border-color .18s, box-shadow .18s;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--navy-light);
+            box-shadow: 0 0 0 3px rgba(36,61,98,.13);
+            outline: none;
+        }
+        .input-group-text {
+            background: #f8fafc;
+            border: 1.5px solid #d1d5db;
+            border-right: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: .88rem;
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+        }
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        .input-group .form-control:focus {
+            border-color: var(--navy-light);
+            border-left: 1.5px solid var(--navy-light);
+        }
+        .input-group:focus-within .input-group-text {
+            border-color: var(--navy-light);
+            border-right: none;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+        }
+        .page-title > i { color: var(--accent); }
+
+        /* ===== STAT CARDS (reportes) ===== */
+        .stat-card {
+            border-radius: var(--radius);
+            padding: 1.4rem 1.5rem;
+            color: #fff;
+            border: none;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-card .stat-icon-wrap {
+            font-size: 2rem;
+            opacity: .7;
+            flex-shrink: 0;
+        }
+        .stat-card .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-card .stat-label {
+            font-size: .83rem;
+            opacity: .85;
+            font-weight: 500;
+            margin-top: .15rem;
+        }
+        .stat-navy  { background: linear-gradient(135deg, var(--navy-dark), var(--navy-light)); }
+        .stat-green { background: linear-gradient(135deg, #14532d, #16a34a); }
+        .stat-red   { background: linear-gradient(135deg, #7f1d1d, #dc2626); }
+
+        /* ===== LOGIN ===== */
+        .login-wrapper {
+            min-height: calc(100vh - 60px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .login-card { width: 100%; max-width: 400px; }
+        .login-card .card-header {
+            text-align: center;
+            padding: 2rem 1.5rem 1.4rem;
+        }
+        .login-card .card-header .login-icon {
+            font-size: 2.6rem;
+            color: var(--accent);
+            display: block;
+            margin-bottom: .5rem;
+        }
+        .login-card .card-header h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: .2rem;
+        }
+        .login-card .card-body  { padding: 1.8rem 2rem; }
+        .login-card .card-footer { text-align: center; }
+        .btn-login {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-light));
+            color: #fff;
+            border: none;
+            padding: .65rem;
+            font-size: .97rem;
+            font-weight: 600;
+            letter-spacing: .3px;
+            border-radius: var(--radius-sm);
+            width: 100%;
+            transition: opacity .18s, transform .15s, box-shadow .15s;
+        }
+        .btn-login:hover {
+            color: #fff;
+            opacity: .92;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(26,46,74,.45);
+        }
+
+        /* ===== MISC ===== */
+        .section-subtitle {
+            font-size: .95rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin: 1.4rem 0 .7rem;
+            padding-bottom: .4rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .empty-state i { font-size: 2.2rem; display: block; margin-bottom: .6rem; }
+
+        .container { padding-top: .25rem; }
+    </style>
 </head>
 <body>
+
 {% if current_user.is_authenticated %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('stock.listar') }}">
             <i class="bi bi-box-seam"></i> Stock IFTS18
         </a>
-        <div class="navbar-nav ms-auto">
-            <span class="nav-item nav-link text-warning">
-                <i class="bi bi-person-badge"></i> {{ current_user.username }} ({{ current_user.rol }})
-            </span>
-            <a class="nav-link" href="{{ url_for('stock.listar') }}"><i class="bi bi-boxes"></i> Productos</a>
-            {% if current_user.rol in ['admin', 'operador'] %}
-            <a class="nav-link" href="{{ url_for('movimientos.listar') }}"><i class="bi bi-arrow-left-right"></i> Movimientos</a>
-            {% endif %}
-            <a class="nav-link" href="{{ url_for('reportes.index') }}"><i class="bi bi-bar-chart"></i> Reportes</a>
-            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Salir</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <div class="navbar-nav ms-auto align-items-lg-center gap-1">
+                <div class="nav-user">
+                    <i class="bi bi-person-circle"></i>
+                    <span>{{ current_user.username }}</span>
+                    <span class="role-pill role-{{ current_user.rol }}">{{ current_user.rol }}</span>
+                </div>
+                <a class="nav-link" href="{{ url_for('stock.listar') }}">
+                    <i class="bi bi-boxes"></i> Productos
+                </a>
+                {% if current_user.rol in ['admin', 'operador'] %}
+                <a class="nav-link" href="{{ url_for('movimientos.listar') }}">
+                    <i class="bi bi-arrow-left-right"></i> Movimientos
+                </a>
+                {% endif %}
+                <a class="nav-link" href="{{ url_for('reportes.index') }}">
+                    <i class="bi bi-bar-chart"></i> Reportes
+                </a>
+                <a class="nav-link nav-logout" href="{{ url_for('auth.logout') }}">
+                    <i class="bi bi-box-arrow-right"></i> Salir
+                </a>
+            </div>
         </div>
     </div>
 </nav>
@@ -33,8 +459,18 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show">
-                    {{ message }}
+                {% if category == 'success' %}
+                    {% set icon = 'bi-check-circle-fill' %}
+                {% elif category == 'danger' %}
+                    {% set icon = 'bi-x-circle-fill' %}
+                {% elif category == 'warning' %}
+                    {% set icon = 'bi-exclamation-triangle-fill' %}
+                {% else %}
+                    {% set icon = 'bi-info-circle-fill' %}
+                {% endif %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show mb-3">
+                    <i class="bi {{ icon }} alert-icon"></i>
+                    <span class="alert-text">{{ message }}</span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
